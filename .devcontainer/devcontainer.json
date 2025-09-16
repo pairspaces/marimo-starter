@@ -1,0 +1,61 @@
+{
+  "name": "marimo-starter",
+  "customizations": {
+    "settings": {
+      "editor.formatOnSave": true,
+      "editor.insertSpaces": true,
+      "files.trimTrailingWhitespace": true,
+      "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/.venv/**": true,
+        "**/venv/**": true
+      }
+    },
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "marimo-ai.marimo-vscode"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/pairspaces/devcontainers/pairspaces": {
+        "token": "TOKEN GOES HERE"
+    }
+  },
+  "forwardPorts": [
+    8080
+  ],
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+  "portsAttributes": {
+    "8080": {
+      "label": "marimo-starter",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": {
+    "marimo": [
+        "/bin/bash",
+        "-lc",
+        "curl -LsSf https://astral.sh/uv/install.sh | sh && uv venv && ([ -f pyproject.toml ] && uv sync --all-extras || true) && uv pip install marimo"
+    ],
+    "pairspaces": [
+      "/opt/pair/pair",
+      "spaces",
+      "bootstrap"
+    ]
+  },
+  "postStartCommand": {
+    "marimo": [
+        "/bin/bash",
+        "-lc",
+        "[ -f .venv/bin/activate ] && uv run marimo --yes edit --host=localhost --port=8080 --headless --no-token || echo 'Marimo failed to start'"
+    ],
+    "supervisord": [
+        "/bin/bash",
+        "-lc",
+        "supervisord -c /etc/supervisor/supervisord.conf"
+    ]
+  },
+  "remoteUser": "root"
+}
