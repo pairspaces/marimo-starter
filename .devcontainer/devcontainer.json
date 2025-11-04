@@ -12,20 +12,15 @@
       }
     },
     "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "marimo-ai.marimo-vscode"
-      ]
+      "extensions": ["ms-python.python","marimo-ai.marimo-vscode"]
     }
   },
   "features": {
-    "ghcr.io/pairspaces/devcontainers/pairspaces": {
+    "ghcr.io/pairspaces/devcontainers-build/pairspaces-build": {
         "token": "TOKEN GOES HERE"
     }
   },
-  "forwardPorts": [
-    8080
-  ],
+  "forwardPorts": [8080],
   "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   "portsAttributes": {
     "8080": {
@@ -34,28 +29,12 @@
     }
   },
   "postCreateCommand": {
-    "marimo": [
-        "/bin/bash",
-        "-lc",
-        "curl -LsSf https://astral.sh/uv/install.sh | sh && uv venv && ([ -f pyproject.toml ] && uv sync --all-extras || true) && uv pip install marimo"
-    ],
-    "pairspaces": [
-      "/opt/pair/pair",
-      "spaces",
-      "bootstrap"
-    ]
+    "marimo": ["/bin/bash", "-lc", "curl -LsSf https://astral.sh/uv/install.sh | sh && uv venv && ([ -f pyproject.toml ] && uv sync --all-extras || true) && uv pip install marimo"],
+    "supervisord": ["/bin/bash", "-lc", "supervisord -c /etc/supervisor/supervisord.conf"]
   },
   "postStartCommand": {
-    "marimo": [
-        "/bin/bash",
-        "-lc",
-        "[ -f .venv/bin/activate ] && uv run marimo --yes edit --host=localhost --port=8080 --headless --no-token || echo 'Marimo failed to start'"
-    ],
-    "supervisord": [
-        "/bin/bash",
-        "-lc",
-        "supervisord -c /etc/supervisor/supervisord.conf"
-    ]
+    "marimo": ["/bin/bash", "-lc", "[ -f .venv/bin/activate ] && uv run marimo --yes edit --host=localhost --port=8080 --headless --no-token || echo 'Marimo failed to start'"],
+    "pairspaces": ["/bin/bash","-lc","/opt/pair/pair spaces bootstrap | tee -a /var/log/pairspaces.log"]
   },
   "remoteUser": "root"
 }
